@@ -194,6 +194,7 @@ Author:: Joshua Timberman (<joshua@opscode.com>)
 Author:: Adam Jacob (<adam@opscode.com>)
 Author:: AJ Christensen (<aj@opscode.com>)
 Author:: Jamie Winsor (<jamie@vialstudios.com>)
+Author:: Chris Griego (<cgriego@gmail.com>)
 
 Copyright:: 2008-2012, Opscode, Inc
 
