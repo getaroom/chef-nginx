@@ -1,7 +1,9 @@
 #
 # Cookbook Name:: nginx
-# Recipe:: default
+# Recipe:: common_config
+#
 # Author:: AJ Christensen <aj@junglist.gen.nz>
+# Author:: Chris Griego <cgriego@gmail.com>
 #
 # Copyright 2008-2012, Opscode, Inc.
 #
@@ -18,26 +20,22 @@
 # limitations under the License.
 #
 
-include_recipe 'nginx::ohai_plugin'
-
-case node['nginx']['install_method']
-when 'source'
-  include_recipe 'nginx::source'
-when 'package'
-  case node['platform']
-  when 'redhat','centos','scientific','amazon','oracle'
-    include_recipe 'yum::epel'
-  end
-  package 'nginx'
-  service 'nginx' do
-    supports :status => true, :restart => true, :reload => true
-    action :enable
-  end
-  include_recipe 'nginx::commons'
-  include_recipe 'nginx::common_config'
+template "nginx.conf" do
+  path "#{node['nginx']['dir']}/nginx.conf"
+  source "nginx.conf.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  notifies :reload, 'service[nginx]', :immediately
 end
 
-service 'nginx' do
-  supports :status => true, :restart => true, :reload => true
-  action :start
+template "#{node['nginx']['dir']}/sites-available/default" do
+  source "default-site.erb"
+  owner "root"
+  group "root"
+  mode 0644
+end
+
+nginx_site 'default' do
+  enable node['nginx']['default_site_enabled']
 end

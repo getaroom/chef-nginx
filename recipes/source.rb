@@ -66,6 +66,8 @@ user node['nginx']['user'] do
   home "/var/www"
 end
 
+include_recipe 'nginx::commons'
+
 node.run_state['nginx_force_recompile'] = false
 node.run_state['nginx_configure_flags'] = 
   node['nginx']['source']['default_configure_flags'] | node['nginx']['configure_flags']
@@ -168,16 +170,7 @@ else
   end
 end
 
-%w{nxensite nxdissite}.each do |nxscript|
-  template "/usr/sbin/#{nxscript}" do
-    source "#{nxscript}.erb"
-    mode "0755"
-    owner "root"
-    group "root"
-  end
-end
-
-include_recipe 'nginx::commons'
+include_recipe 'nginx::common_config'
 
 cookbook_file "#{node['nginx']['dir']}/mime.types" do
   source "mime.types"
