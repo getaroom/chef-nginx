@@ -93,3 +93,7 @@ attribute "nginx/disable_access_log",
 attribute "nginx/default_site_enabled",
   :display_name => "Default site enabled",
   :default => "true"
+
+attribute "nginx/if_modified_since",
+  :display_name => "If-Modified-Since request header handling",
+  :default => "before"
