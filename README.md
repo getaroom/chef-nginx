@@ -54,6 +54,7 @@ Generally used attributes. Some have platform specific values. See `attributes/d
 * `node['nginx']['gzip_http_version']` - used for config value of `gzip_http_version`.
 * `node['nginx']['gzip_comp_level']` - used for config value of `gzip_comp_level`.
 * `node['nginx']['gzip_proxied']` - used for config value of `gzip_proxied`.
+* `node['nginx']['gzip_buffers']` - used for config value of `gzip_buffers`.
 * `node['nginx']['gzip_types']` - used for config value of `gzip_types` - must be an Array.
 
 ### Attributes set in recipes

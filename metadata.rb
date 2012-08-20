@@ -57,6 +57,9 @@ attribute "nginx/gzip_proxied",
   :description => "Whether gzip is proxied",
   :default => "any"
 
+attribute "nginx/gzip_buffers",
+  :display_name => "Nginx Gzip Buffers"
+
 attribute "nginx/gzip_types",
   :display_name => "Nginx Gzip Types",
   :description => "Supported MIME-types for gzip",
