@@ -71,7 +71,11 @@ node.run_state['nginx_configure_flags'] =
   node['nginx']['source']['default_configure_flags'] | node['nginx']['configure_flags']
 
 node['nginx']['source']['modules'].each do |ngx_module|
-  include_recipe "nginx::#{ngx_module}"
+  if ngx_module.include?("::")
+    include_recipe ngx_module
+  else
+    include_recipe "nginx::#{ngx_module}"
+  end
 end
 
 configure_flags = node.run_state['nginx_configure_flags']
