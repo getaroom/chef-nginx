@@ -52,6 +52,7 @@ directory node['nginx']['geoip']['path'] do
   owner "root"
   group "root"
   mode 0755
+  recursive true
 end
 
 remote_file country_src_filepath do
