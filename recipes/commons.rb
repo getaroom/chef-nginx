@@ -21,11 +21,13 @@ directory node['nginx']['dir'] do
   owner "root"
   group "root"
   mode "0755"
+  recursive true
 end
 
 directory node['nginx']['log_dir'] do
   mode 0755
   owner node['nginx']['user']
+  recursive true
   action :create
 end
 
