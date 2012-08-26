@@ -43,7 +43,8 @@ node.set['nginx']['daemon_disable']  = true
 include_recipe "nginx::ohai_plugin"
 include_recipe "build-essential"
 
-src_filepath  = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['version']}.tar.gz"
+cache_path = Chef::Config['file_cache_path'] || '/tmp'
+src_filepath  = "#{cache_path}/nginx-#{node['nginx']['version']}.tar.gz"
 packages = value_for_platform(
     ["centos","redhat","fedora"] => {'default' => ['pcre-devel', 'openssl-devel']},
     "default" => ['libpcre3', 'libpcre3-dev', 'libssl-dev']
@@ -80,20 +81,47 @@ node['nginx']['source']['modules'].each do |ngx_module|
   end
 end
 
+directory "#{cache_path}/nginx-patches"
+
+patch_paths = []
+
+node['nginx']['source']['patches'].each do |patch|
+  patch_basename = patch['basename'] || File.basename(URI(patch['source']).path)
+  patch_path = "#{cache_path}/nginx-patches/#{patch_basename}"
+  patch_paths << patch_path unless patch['action'] == "delete"
+
+  remote_file patch['source'] do
+    path patch_path
+    source patch['source']
+    checksum patch['checksum']
+    action patch['action'] if patch['action']
+    notifies :create, "ruby_block[patch change forces nginx recompile]", :immediately
+  end
+
+  ruby_block "patch change forces nginx recompile" do
+    block { node.run_state['nginx_force_recompile'] = true }
+    action :nothing
+  end
+end
+
 configure_flags = node.run_state['nginx_configure_flags']
-nginx_force_recompile = node.run_state['nginx_force_recompile']
+
+apply_patches = patch_paths.map { |patch_path| "patch -p0 < #{patch_path}" }.join(" && ").concat(" &&") if patch_paths.any?
 
 bash "compile_nginx_source" do
   cwd ::File.dirname(src_filepath)
   code <<-EOH
-    tar zxf #{::File.basename(src_filepath)} -C #{::File.dirname(src_filepath)}
-    cd nginx-#{node['nginx']['version']} && ./configure #{node.run_state['nginx_configure_flags'].join(" ")}
-    make && make install
+    tar zxf #{::File.basename(src_filepath)} -C #{::File.dirname(src_filepath)} &&
+    cd nginx-#{node['nginx']['version']} &&
+    #{apply_patches}
+    ./configure #{node.run_state['nginx_configure_flags'].join(" ")} &&
+    make &&
+    make install &&
     rm -f #{node['nginx']['dir']}/nginx.conf
   EOH
   
   not_if do
-    nginx_force_recompile == false &&
+    node.run_state['nginx_force_recompile'] == false &&
       node.automatic_attrs['nginx'] &&
       node.automatic_attrs['nginx']['version'] == node['nginx']['version'] &&
       node.automatic_attrs['nginx']['configure_arguments'].sort == configure_flags.sort
