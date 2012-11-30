@@ -79,22 +79,35 @@ directory "#{cache_path}/nginx-patches"
 
 patch_paths = []
 
+ruby_block "patch change forces nginx recompile" do
+  block { node.run_state['nginx_force_recompile'] = true }
+  action :nothing
+end
+
 node['nginx']['source']['patches'].each do |patch|
-  patch_basename = patch['basename'] || File.basename(URI(patch['source']).path)
-  patch_path = "#{cache_path}/nginx-patches/#{patch_basename}"
-  patch_paths << patch_path unless patch['action'] == "delete"
+  if patch['source']
+    patch_basename = patch['basename'] || File.basename(URI(patch['source']).path)
+    patch_path = "#{cache_path}/nginx-patches/#{patch_basename}"
+    patch_paths << patch_path unless patch['action'] == "delete"
 
-  remote_file patch['source'] do
-    path patch_path
-    source patch['source']
-    checksum patch['checksum']
-    action patch['action'] if patch['action']
-    notifies :create, "ruby_block[patch change forces nginx recompile]", :immediately
-  end
+    remote_file patch['source'] do
+      path patch_path
+      source patch['source']
+      checksum patch['checksum']
+      action patch['action'] if patch['action']
+      notifies :create, "ruby_block[patch change forces nginx recompile]", :immediately
+    end
+  elsif patch['file']
+    patch_path = "#{cache_path}/nginx-patches/#{patch['file']}"
+    patch_paths << patch_path unless patch['action'] == "delete"
 
-  ruby_block "patch change forces nginx recompile" do
-    block { node.run_state['nginx_force_recompile'] = true }
-    action :nothing
+    cookbook_file patch['file'] do
+      path patch_path
+      source patch['file']
+      cookbook patch['cookbook']
+      action patch['action'] if patch['action']
+      notifies :create, "ruby_block[patch change forces nginx recompile]", :immediately
+    end
   end
 end
 
