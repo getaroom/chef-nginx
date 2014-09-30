@@ -40,7 +40,7 @@ end
 node.set['nginx']['binary']          = "#{node['nginx']['source']['prefix']}/sbin/nginx"
 node.set['nginx']['daemon_disable']  = true
 
-include_recipe "nginx::ohai_plugin"
+# include_recipe "nginx::ohai_plugin"
 include_recipe "build-essential"
 
 cache_path = Chef::Config['file_cache_path'] || '/tmp'
