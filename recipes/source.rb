@@ -40,7 +40,7 @@ end
 node.set['nginx']['binary']          = "#{node['nginx']['source']['prefix']}/sbin/nginx"
 node.set['nginx']['daemon_disable']  = true
 
-# include_recipe "nginx::ohai_plugin"
+include_recipe "nginx::ohai_plugin"
 include_recipe "build-essential"
 
 cache_path = Chef::Config['file_cache_path'] || '/tmp'
@@ -70,7 +70,7 @@ end
 include_recipe 'nginx::commons'
 
 node.run_state['nginx_force_recompile'] = false
-node.run_state['nginx_configure_flags'] = 
+node.run_state['nginx_configure_flags'] =
   node['nginx']['source']['default_configure_flags'] | node['nginx']['configure_flags']
 
 node['nginx']['source']['modules'].each do |ngx_module|
@@ -132,7 +132,7 @@ bash "compile_nginx_source" do
     make install &&
     rm -f #{node['nginx']['dir']}/nginx.conf
   EOH
-  
+
   not_if do
     node.run_state['nginx_force_recompile'] == false &&
       node.automatic_attrs['nginx'] &&

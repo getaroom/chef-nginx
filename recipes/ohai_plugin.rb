@@ -18,9 +18,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe "ohai"
 
-ohai "nginx" do
-  action :nothing
+ohai_plugin "nginx" do
+  source_file 'nginx.rb.erb'
+  resource :template
 end
 
 template "#{node['ohai']['plugin_path']}/nginx.rb" do
@@ -34,4 +36,3 @@ template "#{node['ohai']['plugin_path']}/nginx.rb" do
   notifies :reload, "ohai[nginx]", :immediately
 end
 
-include_recipe "ohai"

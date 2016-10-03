@@ -2,7 +2,7 @@ maintainer        "Opscode, Inc."
 maintainer_email  "cookbooks@opscode.com"
 license           "Apache 2.0"
 description       "Installs and configures nginx"
-version           "0.101.6"
+version           "0.101.7"
 name              "nginx"
 
 recipe "nginx", "Installs nginx package and sets up configuration with Debian apache style with sites-enabled/sites-available"
@@ -16,7 +16,7 @@ end
   depends cb
 end
 
-depends 'ohai', '~> 1.0.2'
+depends 'ohai', '>= 4.1.0'
 
 attribute "nginx/dir",
   :display_name => "Nginx Directory",
