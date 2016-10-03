@@ -23,16 +23,7 @@ include_recipe "ohai"
 ohai_plugin "nginx" do
   source_file 'nginx.rb.erb'
   resource :template
-end
-
-template "#{node['ohai']['plugin_path']}/nginx.rb" do
-  source "plugins/nginx.rb.erb"
-  owner "root"
-  group "root"
-  mode 0755
   variables(
     :nginx_bin => node['nginx']['binary']
   )
-  notifies :reload, "ohai[nginx]", :immediately
 end
-
