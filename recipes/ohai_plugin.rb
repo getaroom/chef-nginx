@@ -27,3 +27,4 @@ ohai_plugin "nginx" do
     :nginx_bin => node['nginx']['binary']
   )
 end
+
