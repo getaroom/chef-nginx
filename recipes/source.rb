@@ -155,6 +155,23 @@ when "runit"
     supports :status => true, :restart => true, :reload => true
     reload_command "[[ -f #{node['nginx']['pid']} ]] && kill -HUP `cat #{node['nginx']['pid']}` || true"
   end
+when "systemd"
+  node.set['nginx']['src_binary'] = node['nginx']['binary']
+
+  template "/lib/systemd/system/nginx.service" do
+    source "nginx.service.erb"
+    owner "root"
+    group "root"
+    mode "0755"
+    variables({
+      :src_binary => node['nginx']['binary'],
+      :pid => node['nginx']['pid']
+    })
+  end
+
+  service "nginx" do
+    supports :status => true, :restart => true, :reload => true
+  end
 when "bluepill"
   include_recipe "bluepill"
 
